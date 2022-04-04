@@ -3,7 +3,8 @@ Merci de copier ici les notebooks Kaggle qui sont utiles au projet par rapport a
 1 segmentation client et travail exploratoire sur Dataset Customers
 2 création des catégories de produit et travail exploratoire sur Dataset Articles
 3 travail effectué sur les transactions 
-4 autres
+4 recommandations
+5 autres
 
 
 Comment nommer les fichiers:
