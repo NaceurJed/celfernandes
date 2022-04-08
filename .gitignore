@@ -6,6 +6,5 @@ raw_data/
 articles.csv
 customers.csv
 transactions_train.csv
-*.csv
 **/__pycache__/
 .env
