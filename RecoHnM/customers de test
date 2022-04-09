@@ -1,0 +1,11 @@
+***************** customers_id pour tests SEGMENT 1 ********************
+
+# test1 a acheté en 103 4 fois Jersey basic et 1 fois un Jersey Fancy + 1 accessoire en 104
+S1_base['customer_id']=='00953d607bb9b498cf020c314436b74c54876e1f03739a7e8312af21b89d83a5'
+S1_client_test1=S1_base[S1_base['customer_id']=='00953d607bb9b498cf020c314436b74c54876e1f03739a7e8312af21b89d83a5'].merge(articles_hetm)
+S1_client_test1
+
+# test2 a acheté en 103 2 fois Jersey basic et 2 fois un trousers / pas d'achat en 104
+S1_base['customer_id']=='0285d6fbe7c6db42c94a540de427c4f24c30e863d4ca18f0ca611d4938ab1a48'
+S1_client_test2=S1_base[S1_base['customer_id']=='0285d6fbe7c6db42c94a540de427c4f24c30e863d4ca18f0ca611d4938ab1a48'].merge(articles_hetm)
+S1_client_test2
