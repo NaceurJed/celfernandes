@@ -8,3 +8,4 @@ customers.csv
 transactions_train.csv
 **/__pycache__/
 .env
+data/
