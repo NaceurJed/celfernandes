@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+from process_flow import *
+
 #***************************************************************************************************************
 #
 #                Cherche les meilleurs paramètres des modèles Kmeans sur
