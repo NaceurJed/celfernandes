@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
 
-def clustering_customers(number_of_clusters)
+def clustering_customers(number_of_clusters):
     # Configuring the parameters of the clustering algorithm
     customers = pd.read_csv('../data/customers_feature_engineered.csv')
 
@@ -18,5 +18,6 @@ def clustering_customers(number_of_clusters)
     # Adding the results to a new column in the dataframe
     customers["cluster_KNN"] = KMeans_cluster.labels_
 
-def customers_with_clusters():
+def customers_with_clusters(number_of_clusters):
+    clustering_customers(number_of_clusters)
     return customers[['article_id','cluster_KNN']]
