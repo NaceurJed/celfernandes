@@ -1,19 +1,7 @@
-from baseline0 import *
-from data import *
+from RecoHnM.data import *
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder
 
-def encode_categories_articles(clusters_articles_df):  #df doit avoir les champs format ['article_id','catID']
-    # création de dummies pour chaque catégorie de produits
-    cluster_name=clusters_articles_df.columns[1]
-    ohe = OneHotEncoder(sparse=False)# Instanciate encoder
-    cat_encoded=pd.DataFrame(ohe.fit_transform(clusters_articles_df[[cluster_name]]))
-    cat_names=ohe.categories_
-    return pd.concat([articles_hetm[['article_id']],cat_encoded], axis=1)
-
-def build_segment_base(segment): # ce df contient toutes les transactions des individus du segment
-    return segment[['customer_id']].merge(transact_history)
 
 def build_segment_horizon_transactions(segment_base,X_week,horizon):
     #filtrage sur l'horizon temporel pour connaitre les préférences des customers
@@ -39,93 +27,105 @@ def build_matrix(Xh_week_achats):
     return segment_matrix
 
 def get_max_cats(Xh_week_achats,clusters_articles_df):
+    ######################################################################################################
+    #  catégories de produits achetés par customer, de la plus achetée (rank=1) à la moins achetée       #
+    ######################################################################################################
     # contrairement à la construction de la matrice, ici je veut les infos de transactions en lignes
-    # diversity sera le nbre de catégories utilisées pour proposer 12 références
     tmp=Xh_week_achats.drop(columns='t_dat').merge(clusters_articles_df)
     cluster_name=clusters_articles_df.columns[1]
-    achats_for_max_cats=tmp.groupby(['customer_id',cluster_name],as_index=False).sum()
-    achats_for_max_cats.sort_values(by=['customer_id','counter'],ascending=False,inplace=True)
-    achats_for_max_cats['rank']=achats_for_max_cats.groupby('customer_id')['counter'].rank(method='first',ascending=False)
-    return achats_for_max_cats
+    cust_max_cats=tmp.groupby(['customer_id',cluster_name],as_index=False).sum()
+    cust_max_cats.sort_values(by=['customer_id','counter'],ascending=False,inplace=True)
+    cust_max_cats['rank']=cust_max_cats.groupby('customer_id')['counter'].rank(method='first',ascending=False)
+    cust_max_cats['cat_perc']=cust_max_cats.groupby('customer_id', as_index=True, group_keys=False)['counter'].apply(lambda x: x / x.sum())
+    return cust_max_cats
+
+def calc_diversity_per_cust(cust_max_cats,threshold): #threshold est un pourcentage , exemple 30 pour 30%
+    max_nb_cats=int(100/threshold)
+    cust_max_cats['keep_cat']=cust_max_cats['cat_perc'].map(lambda x : 1 if x>=(threshold/100) else 0)
+    # dans la ligne ci-dessous je suis obligée de lui mettre x/x (=1) dans la lambda fonction sinon il retourne NaN si dans le 
+    # calcul on utilise pas la valeur x elle-même
+    cust_max_cats['cust_diversity']=cust_max_cats.groupby('customer_id', as_index=True, group_keys=False)['keep_cat'].apply(lambda x: x/x * x.sum())
+    return cust_max_cats
 
 def top12_per_cat(segment_base,X_week,p,clusters_articles_df):
     # p est le nombre de périodes utilisées pour déterminer le top12 (différent de horizon)
     week_min= X_week-p+1
     week_max= X_week
     filtre=np.logical_and(segment_base['t_dat'] >= week_min,segment_base['t_dat'] <= week_max)
-    top12_cat=segment_base[filtre].drop(columns=['customer_id','t_dat']).merge(clusters_articles_df)
+    tmp=segment_base[filtre].drop(columns=['customer_id','t_dat']).merge(clusters_articles_df)
     cluster_name=clusters_articles_df.columns[1]
-    top12_cat['counter']=1
-    top12_cat=top12_cat.groupby([cluster_name,'article_id'],as_index=False).sum()
-    top12_cat.sort_values(by=[cluster_name,'counter'],ascending=False,inplace=True)
-    top12_cat['rank']=top12_cat.groupby(cluster_name)['counter'].rank(method='first',ascending=False)
-    keep_first_12=top12_cat['rank']<=12
-    top12_cat_12=top12_cat[keep_first_12]
-    return top12_cat_12
+    tmp['counter']=1
+    tmp=tmp.groupby([cluster_name,'article_id'],as_index=False).sum()
+    tmp.sort_values(by=[cluster_name,'counter'],ascending=False,inplace=True)
+    tmp['rank']=tmp.groupby(cluster_name)['counter'].rank(method='first',ascending=False)
+    keep_first_12=tmp['rank']<=12
+    top12_cat=tmp[keep_first_12] 
+    return top12_cat
+    
+def top_df_to_dict(top_df): # transforme le Top format dataframe à format dictionnaire
+    #########j'ai un warning pour cette ligne de code ci après:
+    #A value is trying to be set on a copy of a slice from a DataFrame.
+    #Try using .loc[row_indexer,col_indexer] = value instead
+    #############################################################################
+    #top_df['article_id']=top_df['article_id'].astype(str) #nécessaire pour utiliser la méthode .join qui travaille sur des str
+    cat_list=top_df.iloc[:,0].values
+    dict_top_cats={}
+    for cat in cat_list:
+        mask=top_df.iloc[:,0]==cat
+        tmp=top_df[mask]
+        #je passe à ma clef de dictionnaire (= cat) une string contenant les articles_id associés à la cat
+        articles_arr=tmp['article_id'].values
+        #articles_str=" ".join(tmp['article_id'].values) 
+        dict_top_cats[cat]= articles_arr #articles_str
+    return dict_top_cats
 
-def top12_split(top12_cat_12,diversity): # dans cette version l'algo gère diversity in [1,2,3,4,6,12]
-        if diversity==1:
-            return top12_cat_12
-        else:
-            top_nb=12/diversity
-            return top12_cat_12[top12_cat_12['rank']<=top_nb]
+############ je généralise la méthode ci-dessus à tout df qu'on veut transformer en dictionnaire##############
+## group_name = nom de la série quon veut considérer comme un group_by 
+## value_to_list = nom de la variable dont les valeurs prises par le groupe sont à passer dans une liste
+
+def df_to_dict(df,group_name,value_to_list): # transforme le format dataframe à format dictionnaire
+    df[value_to_list]=df[value_to_list].astype(str) #nécessaire pour utiliser la méthode .join qui travaille sur des str
+    group_list=df.loc[:,group_name].values
+    dict_group_values={}
+    for group in group_list:
+        mask=df.loc[:,group_name]==group
+        tmp=df[mask]
+        #je passe à ma clef de dictionnaire (=group) une string contenant les values associées au sein du groupe
+        values_list=tmp[value_to_list].values
+        #values_str=" ".join(tmp[value_to_list].values) 
+        dict_group_values[group]=values_list
+    return dict_group_values 
+
+def top12_filtre(top12_cat): # dans cette version l'algo gère nb_cat_to_predict in [1,2,3,4,6,12]
+        nb_cat_to_predict=[1,2,3,4,6,12]
+        for nb in nb_cat_to_predict:
+            top_nb=12/nb
+            if nb==1:
+                top12x1cat=top12_cat
+                dict_top12x1cat=top_df_to_dict(top12x1cat)
+                top12x1cat.to_csv('top12x1cat.csv')
+            elif nb==2:
+                top6x2cat=top12_cat[top12_cat['rank']<=top_nb]
+                dict_top6x2cat=top_df_to_dict(top6x2cat)
+                top6x2cat.to_csv('top6x2cat.csv')
+            elif nb==3:
+                top4x3cat=top12_cat[top12_cat['rank']<=top_nb]
+                dict_top4x3cat=top_df_to_dict(top4x3cat)
+                top4x3cat.to_csv('top4x3cat.csv')
+            elif nb==4:
+                top3x4cat=top12_cat[top12_cat['rank']<=top_nb]
+                dict_top3x4cat=top_df_to_dict(top3x4cat)
+                top3x4cat.to_csv('top3x4cat.csv')
+            elif nb==6:
+                top2x6cat=top12_cat[top12_cat['rank']<=top_nb]
+                dict_top2x6cat=top_df_to_dict(top2x6cat)
+                top2x6cat.to_csv('top2x6cat.csv')
+            elif nb==12:    
+                top1x12cat=top12_cat[top12_cat['rank']<=top_nb]
+                dict_top1x12cat=top_df_to_dict(top1x12cat)
+                top1x12cat.to_csv('top1x12cat.csv')
+        return dict_top12x1cat#,dict_top6x2cat,dict_top4x3cat,dict_top3x4cat,dict_top2x6cat,dict_top1x12cat
+ 
 
 
-def predict()
 
-    # je donne baseline0 à tout le segment, puis j'affine ?
-    #ou pour optimiser if vide -> je donne baseline0
-
-
-
-
-    #définition du Top12 par catégorie: à la valeur de garment j'associe la valeur TOP12 associée
-    #calcul du Top12 par catégorie stocké sous forme de dictionnaire
-    achats_cat_art=X_achats.groupby(['garment_group_name','article_id'], as_index=False, sort=False).sum().sort_values(by=['garment_group_name', X_week_dummy], ascending=False)
-    Top12_cat={}
-    list=ohe.categories_[0]
-    for cat in list:
-        Top12=""
-        mask=achats_cat_art['garment_group_name']==cat
-        df=achats_cat_art[mask]
-        Top12_arr=df['article_id'].head(12).values
-        for article in Top12_arr:
-            Top12=Top12+ " "+ str(article)
-        Top12_cat[cat]= Top12.lstrip()
-
-    achats_cat_max.loc[:,'Baseline1']=achats_cat_max['garment_group_name'].apply(lambda c: Top12_cat[c])
-
-
-
-
-
-def predict():
-# je retourne sur leurs achats et je vérifie si la baseline0 est un bon prédicteur
-    # des achats réellement effectués par les clients en semaine y_week
-    # je dois calculer combien de mes achats en y_week étaient dans ma Baseline
-    # si ils sont dans ma Baseline0 alors 1 sinon 0
-
-    y_achats['inBaseline0']=y_achats['article_id'].apply(lambda x: 1 if str(x) in Top12 else 0)
-    Baseline0_precision=y_achats.groupby(['customer_id']).sum().drop(columns= ['article_id', y_week_dummy]).rename(columns={'inBaseline0':'Precision'})
-
-    print("Statistiques concernant le segment:")
-    print("Taille du segment : " + f'{len(segment)}')
-    print("Nbre d'acheteurs en yweek : " + f'{len(Baseline0_precision)}')
-    print("Précision moyenne:" + f'{Baseline0_precision.mean()}')
-
-    return results Baseline0_precision.mean
-
-def evaluate():
-    pass
-
-if __name__ == "__main__":
-
-    articles_hetm = get_data('../raw_data/articles.csv')
-
-    transactions_file='transaction_train_week_101_104.csv'
-    transactions_file_path=f'../raw_data/{transactions_file}'
-    transact_history=get_data(transactions_file_path)
-
-    articles_categories=encode_categories_articles(clusters_articles_df,categories)
-    segment_base=build_base_segment(segment)
-    segment_matrix=build_matrix(segment,transact_history,X_week,y_week,horizon)
