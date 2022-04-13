@@ -9,6 +9,7 @@ numpy
 pandas
 scikit-learn
 streamlit
+streamlit_modal
 
 # tests/linter
 black
