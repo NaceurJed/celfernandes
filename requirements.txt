@@ -10,6 +10,7 @@ pandas
 scikit-learn
 streamlit
 streamlit_modal
+hydralit_components
 
 # tests/linter
 black
