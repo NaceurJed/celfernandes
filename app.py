@@ -159,7 +159,7 @@ if query_param:
         data = pickle.load(fp)
 
     customerX = data[result]  
-    np.loadtxt('baseline_test.txt', dtype=int)
+    # np.loadtxt('baseline_test.txt', dtype=int)
 
     if result == 'baseline':
       st.markdown("""<div class="text-center"><h4>Catégories tendance</h4> </div>""",unsafe_allow_html=True)
