@@ -10,6 +10,18 @@ import streamlit.components.v1 as components
 #Experimental
 import hydralit_components as hc
 
+# On recupére ce qu'on a rentré dans le modal (champ customer)
+query_param = st.experimental_get_query_params()
+# On verifie si le dictionnaire query_param est vide (si c'est vide alors dico = True)
+dico = not bool(query_param)
+# si dico est True alors en envoi 'baseline' comme paramétre dasn l'URL
+if dico:
+  st.experimental_set_query_params(
+      text="baseline",
+  )
+
+
+
 #######################################################################################
 #Haut de page
 navbar = """
@@ -95,11 +107,10 @@ modal_code = """
 
 #####################################################################
 
-
-
 st.markdown(navbar,unsafe_allow_html=True)
 
-#######################################################################################
+
+
 
 #######################################################################################
 # CSS
@@ -124,12 +135,18 @@ st.markdown(''' <style>
                     }
                     .btn:not(:disabled):not(.disabled){text-decoration: none;}
 
+                    .css-18e3th9 {
+                      padding-top: 2rem;
+                      padding-bottom: 0}
+                    .navbar-expand-lg {padding-bottom: 0}
+
+
                 </style>''',unsafe_allow_html=True)
 #######################################################################################
 
 
 st.image('images/logo/header.png')
-st.image('images/logo/nouveautes.png')
+st.image('images/logo/collection.png')
 
 
 # if(st.button('Login')):
@@ -138,102 +155,180 @@ query_param = st.experimental_get_query_params()
 
 if query_param:
     result = query_param['text'][0]
-    with open('data_test.json', 'rb') as fp:
+    with open('demod.json', 'rb') as fp:
         data = pickle.load(fp)
 
     customerX = data[result]  
     np.loadtxt('baseline_test.txt', dtype=int)
 
-    st.markdown("""<div class="text-center"><h1>Catégories tendance</h1> </div>""",unsafe_allow_html=True)
-    col1, col2, col3, col4, col5, col6= st.columns(6)
+    if result == 'baseline':
+      st.markdown("""<div class="text-center"><h4>Catégories tendance</h4> </div>""",unsafe_allow_html=True)
+    else:
+      st.markdown("""<div class="text-center"><h4>Vos recommandations personnalisées</h4> </div>""",unsafe_allow_html=True)
+    # st.markdown("""<div class="text-center"><h4>Vos recommandations personnalisées</h4> </div>""",unsafe_allow_html=True)
+
+    col1, col2, col3, col4, col5, col6, col7, col8, col9, col10= st.columns(10)
 
     with col1:
-        st.image(f'images/produits/0{customerX[0]}.jpg', width=200)
-
+        st.image('images/produits/blanc.jpg', width=120)
     with col2:
-        st.image(f'images/produits/0{customerX[1]}.jpg', width=200)
+        st.image('images/produits/blanc.jpg', width=120)
 
     with col3:
-        st.image(f'images/produits/0{customerX[2]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[0]}.jpg', width=120)
 
     with col4:
-        st.image(f'images/produits/0{customerX[3]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[1]}.jpg', width=120)
 
     with col5:
-        st.image(f'images/produits/0{customerX[4]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[2]}.jpg', width=120)
 
     with col6:
-        st.image(f'images/produits/0{customerX[5]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[3]}.jpg', width=120)
+
+    with col7:
+        st.image(f'images/produits/0{customerX[4]}.jpg', width=120)
+
+    with col8:
+        st.image(f'images/produits/0{customerX[5]}.jpg', width=120)
+    
+    with col9:
+        st.image('images/produits/blanc.jpg', width=120)
+    with col10:
+        st.image('images/produits/blanc.jpg', width=120)
 
     #Deuxiéme ligne des ligne
-    col11, col12, col13, col14, col15, col16= st.columns(6)
+    col11, col12, col13, col14, col15, col16, col17, col18, col19, col110= st.columns(10)
 
     with col11:
-        st.image(f'images/produits/0{customerX[6]}.jpg', width=200)
-
+        st.image('images/produits/blanc.jpg', width=120)
     with col12:
-        st.image(f'images/produits/0{customerX[7]}.jpg', width=200)
+        st.image('images/produits/blanc.jpg', width=120)
 
     with col13:
-        st.image(f'images/produits/0{customerX[8]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[6]}.jpg', width=120)
 
     with col14:
-        st.image(f'images/produits/0{customerX[9]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[7]}.jpg', width=120)
 
     with col15:
-        st.image(f'images/produits/0{customerX[10]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[8]}.jpg', width=120)
 
     with col16:
-        st.image(f'images/produits/0{customerX[11]}.jpg', width=200)
+        st.image(f'images/produits/0{customerX[9]}.jpg', width=120)
 
-else:
+    with col17:
+        st.image(f'images/produits/0{customerX[10]}.jpg', width=120)
+
+    with col18:
+        st.image(f'images/produits/0{customerX[11]}.jpg', width=120)
+
+    with col19:
+        st.image('images/produits/blanc.jpg', width=120)
+    with col110:
+        st.image('images/produits/blanc.jpg', width=120)
+
+    
+    # st.markdown("""<div class="text-center"><h2>Mes derniers achats</h2> </div>""",unsafe_allow_html=True)
+    # col111, col112, col113, col114, col115, col116, col117, col118, col119, col120= st.columns(10)
+
+    # with col111:
+    #     st.image('images/produits/blanc.jpg', width=120)
+    # with col112:
+    #     st.image('images/produits/blanc.jpg', width=120)
+
+    # with col113:
+    #     st.image(f'images/produits/0{customerX[6]}.jpg', width=120)
+
+    # with col114:
+    #     st.image(f'images/produits/0{customerX[7]}.jpg', width=120)
+
+    # with col115:
+    #     st.image(f'images/produits/0{customerX[8]}.jpg', width=120)
+
+    # with col116:
+    #     st.image(f'images/produits/0{customerX[9]}.jpg', width=120)
+
+    # with col117:
+    #     st.image(f'images/produits/0{customerX[10]}.jpg', width=120)
+
+    # with col118:
+    #     st.image(f'images/produits/0{customerX[1]}.jpg', width=120)
+
+    # with col119:
+    #     st.image('images/produits/blanc.jpg', width=120)
+    # with col120:
+    #     st.image('images/produits/blanc.jpg', width=120)
+
+# else:
 
 
-    # On récupére les données (id images) du fichier baseline_test.txt
-    liste_id_image = np.loadtxt('baseline_test.txt', dtype=int)
-    st.markdown("""<div class="text-center"><h1>Catégories tendance</h1> </div>""",unsafe_allow_html=True)
-    col1, col2, col3, col4, col5, col6= st.columns(6)
+#     # On récupére les données (id images) du fichier baseline_test.txt
+#     liste_id_image = np.loadtxt('baseline_test.txt', dtype=int)
+#     st.markdown("""<div class="text-center"><h4>Catégories tendance</h4> </div>""",unsafe_allow_html=True)
+#     col1, col2, col3, col4, col5, col6, col7, col8, col9, col10= st.columns(10)
 
-    #Premiére ligne des articles
-    with col1:
-        st.image(f'images/produits/0{liste_id_image[0]}.jpg', width=200)
+#     #Premiére ligne des articles
+#     with col1:
+#         st.image('images/produits/blanc.jpg', width=120)
+#     with col2:
+#         st.image('images/produits/blanc.jpg', width=120)
 
-    with col2:
-        st.image(f'images/produits/0{liste_id_image[1]}.jpg', width=200)
+#     with col3:
+#         st.image(f'images/produits/0{liste_id_image[0]}.jpg', width=120)
 
-    with col3:
-        st.image(f'images/produits/0{liste_id_image[2]}.jpg', width=200)
+#     with col4:
+#         st.image(f'images/produits/0{liste_id_image[1]}.jpg', width=120)
 
-    with col4:
-        st.image(f'images/produits/0{liste_id_image[3]}.jpg', width=200)
+#     with col5:
+#         st.image(f'images/produits/0{liste_id_image[2]}.jpg', width=120)
 
-    with col5:
-        st.image(f'images/produits/0{liste_id_image[4]}.jpg', width=200)
+#     with col6:
+#         st.image(f'images/produits/0{liste_id_image[3]}.jpg', width=120)
 
-    with col6:
-        st.image(f'images/produits/0{liste_id_image[5]}.jpg', width=200)
+#     with col7:
+#         st.image(f'images/produits/0{liste_id_image[4]}.jpg', width=120)
 
-    #Deuxiéme ligne des ligne
-    col11, col12, col13, col14, col15, col16= st.columns(6)
+#     with col8:
+#         st.image(f'images/produits/0{liste_id_image[5]}.jpg', width=120)
 
-    with col11:
-        st.image(f'images/produits/0{liste_id_image[6]}.jpg', width=200)
+#     with col9:
+#         st.image('images/produits/blanc.jpg', width=120)
+#     with col10:
+#         st.image('images/produits/blanc.jpg', width=120)
 
-    with col12:
-        st.image(f'images/produits/0{liste_id_image[7]}.jpg', width=200)
+#     #Deuxiéme ligne des ligne
+#     col11, col12, col13, col14, col15, col16, col17, col18, col19, col20= st.columns(10)
 
-    with col13:
-        st.image(f'images/produits/0{liste_id_image[8]}.jpg', width=200)
+#     with col11:
+#         st.image('images/produits/blanc.jpg', width=120)
+#     with col12:
+#         st.image('images/produits/blanc.jpg', width=120)
 
-    with col14:
-        st.image(f'images/produits/0{liste_id_image[9]}.jpg', width=200)
+#     with col13:
+#         st.image(f'images/produits/0{liste_id_image[6]}.jpg', width=120)
 
-    with col15:
-        st.image(f'images/produits/0{liste_id_image[10]}.jpg', width=200)
+#     with col14:
+#         st.image(f'images/produits/0{liste_id_image[7]}.jpg', width=120)
 
-    with col16:
-        st.image(f'images/produits/0{liste_id_image[11]}.jpg', width=200)
+#     with col15:
+#         st.image(f'images/produits/0{liste_id_image[8]}.jpg', width=120)
 
+#     with col16:
+#         st.image(f'images/produits/0{liste_id_image[9]}.jpg', width=120)
+
+#     with col17:
+#         st.image(f'images/produits/0{liste_id_image[10]}.jpg', width=120)
+
+#     with col18:
+#         st.image(f'images/produits/0{liste_id_image[11]}.jpg', width=120)
+
+#     with col19:
+#         st.image('images/produits/blanc.jpg', width=120)
+#     with col20:
+#         st.image('images/produits/blanc.jpg', width=120)
+
+st.image('images/logo/nouveautes.png')
 
 st.image('images/logo/footer.png')
 
