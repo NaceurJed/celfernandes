@@ -50,47 +50,9 @@ navbar = """
 </nav>
 
 """
-st.markdown(navbar,unsafe_allow_html=True)
-
-#######################################################################################
-
-#######################################################################################
-# CSS
-st.markdown(''' <style>
-                    .stApp{background-color: #FAF9F8;}
-                    div.etr89bj1>img {border-radius: 50px;}
-
-                    .css-qrbaxs {font-size: 20px;}
-
-                    #MainMenu {visibility: hidden;}
-                    footer {visibility: hidden;}
-
-                    .modal-dialog {
-                    position: absolute;
-                    top: 50px;
-                    right: 100px;
-                    bottom: 0;
-                    left: 0;
-                    z-index: 10040;
-                    overflow: auto;
-                    overflow-y: auto;
-                    }
-                    .btn:not(:disabled):not(.disabled){text-decoration: none;}
-
-                </style>''',unsafe_allow_html=True)
-#######################################################################################
-
-
-
-
-st.image('images/logo/header.png')
-st.image('images/logo/nouveautes.png')
-
-# Champ de saisi du customer id
-# customer_id = st.text_input('Customer ID',)
 
 ####################################################################
-# Experimental
+# Modal
 hc.hydralit_experimental(True)
 
 
@@ -132,6 +94,43 @@ modal_code = """
 """
 
 #####################################################################
+
+
+
+st.markdown(navbar,unsafe_allow_html=True)
+
+#######################################################################################
+
+#######################################################################################
+# CSS
+st.markdown(''' <style>
+                    .stApp{background-color: #FAF9F8;}
+                    div.etr89bj1>img {border-radius: 50px;}
+
+                    .css-qrbaxs {font-size: 20px;}
+
+                    #MainMenu {visibility: hidden;}
+                    footer {visibility: hidden;}
+
+                    .modal-dialog {
+                    position: absolute;
+                    top: 50px;
+                    right: 100px;
+                    bottom: 0;
+                    left: 0;
+                    z-index: 10040;
+                    overflow: auto;
+                    overflow-y: auto;
+                    }
+                    .btn:not(:disabled):not(.disabled){text-decoration: none;}
+
+                </style>''',unsafe_allow_html=True)
+#######################################################################################
+
+
+st.image('images/logo/header.png')
+st.image('images/logo/nouveautes.png')
+
 
 # if(st.button('Login')):
 st.markdown(modal_code,unsafe_allow_html=True)
