@@ -17,10 +17,16 @@ dico = not bool(query_param)
 # si dico est True alors en envoi 'baseline' comme paramétre dasn l'URL
 if dico:
   st.experimental_set_query_params(
-      text="baseline",
+      id="baseline",
   )
-
-
+else:
+  id_customer = query_param['id'][0]
+  if id_customer != 'caro' and id_customer != 'celine':
+    st.warning(f'"{id_customer}" identifiant inconnu')
+    st.experimental_set_query_params(
+      id="baseline",
+    )
+    
 
 #######################################################################################
 #Haut de page
@@ -86,7 +92,7 @@ modal_code = """
 <div class="form-group">
 <label class="control-label col-sm-2" for="email">Identifiant</label>
 <div class="col-sm-10">
-  <input type="text" class="form-control" id="id" placeholder="Enter customer ID" name="text">
+  <input type="text" class="form-control" id="id" placeholder="Enter customer ID" name="id">
 </div>
 </div>
 
@@ -154,7 +160,7 @@ st.markdown(modal_code,unsafe_allow_html=True)
 query_param = st.experimental_get_query_params()
 
 if query_param:
-    result = query_param['text'][0]
+    result = query_param['id'][0]
     with open('demod.json', 'rb') as fp:
         data = pickle.load(fp)
 
