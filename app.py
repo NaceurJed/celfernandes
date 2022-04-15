@@ -81,7 +81,7 @@ modal_code = """
 <div class="modal-dialog" role="document">
 <div class="modal-content">
 <div class="modal-header">
-  <h4 class="modal-title" id="exampleModalLabel">Connexion</h4>
+  <h4 class="modal-title text-dark" id="exampleModalLabel">Connexion</h4>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -90,7 +90,7 @@ modal_code = """
   <div class="container">
 <form class="form-horizontal" action="/">
 <div class="form-group">
-<label class="control-label col-sm-2" for="email">Identifiant</label>
+<label class="control-label col-sm-2 text-dark" for="email">Identifiant</label>
 <div class="col-sm-10">
   <input type="text" class="form-control" id="id" placeholder="Enter customer ID" name="id">
 </div>
