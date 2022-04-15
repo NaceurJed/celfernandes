@@ -140,7 +140,7 @@ st.markdown(''' <style>
                     overflow-y: auto;
                     }
                     .btn:not(:disabled):not(.disabled){text-decoration: none;}
-
+                    h3{color: #595656;}
                     .css-18e3th9 {
                       padding-top: 2rem;
                       padding-bottom: 0}
@@ -168,9 +168,9 @@ if query_param:
     # np.loadtxt('baseline_test.txt', dtype=int)
 
     if result == 'baseline':
-      st.markdown("""<div class="text-center"><h4>Catégories tendance</h4> </div>""",unsafe_allow_html=True)
+      st.markdown("""<div class="text-center"><h3>Catégories tendance</h3> </div>""",unsafe_allow_html=True)
     else:
-      st.markdown("""<div class="text-center"><h4>Vos recommandations personnalisées</h4> </div>""",unsafe_allow_html=True)
+      st.markdown("""<div class="text-center"><h3>Vos recommandations personnalisées</h3> </div>""",unsafe_allow_html=True)
     # st.markdown("""<div class="text-center"><h4>Vos recommandations personnalisées</h4> </div>""",unsafe_allow_html=True)
 
     col1, col2, col3, col4, col5, col6, col7, col8, col9, col10= st.columns(10)
