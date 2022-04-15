@@ -21,7 +21,7 @@ if dico:
   )
 else:
   id_customer = query_param['id'][0]
-  if id_customer != 'caro' and id_customer != 'celine':
+  if id_customer != 'caro' and id_customer != 'celine' and id_customer != 'baseline':
     st.warning(f'"{id_customer}" identifiant inconnu')
     st.experimental_set_query_params(
       id="baseline",
